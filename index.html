@@ -1,0 +1,1293 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>AI Tool Finder</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Big+Shoulders:wght@600;700;800&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  :root{
+    --paper:#F2F4F6;
+    --paper-raised:#FFFFFF;
+    --ink:#121924;
+    --ink-soft:#4B5563;
+    --line:#D8DEE4;
+    --line-soft:#E6EAEE;
+    --accent:#D97C33;
+    --accent-ink:#7A3E10;
+    --accent-soft:#FBE7D3;
+    --slate:#3E5C76;
+    --slate-soft:#E3EBF1;
+    --ok:#2F7D53;
+    --ok-soft:#DEEFE4;
+    --caution:#9C7A16;
+    --caution-soft:#F4E9C9;
+    --unknown:#5B6572;
+    --unknown-soft:#E7E9EC;
+    --restricted:#A73B33;
+    --restricted-soft:#F7DEDB;
+    --shadow: 0 1px 2px rgba(18,25,36,0.06), 0 8px 24px -12px rgba(18,25,36,0.18);
+    --radius: 14px;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#0D1218;
+      --paper-raised:#161D26;
+      --ink:#E9EDF2;
+      --ink-soft:#9AA5B1;
+      --line:#2A3441;
+      --line-soft:#212933;
+      --accent:#E8944D;
+      --accent-ink:#FBD9B4;
+      --accent-soft:#3A2716;
+      --slate:#8FB0CC;
+      --slate-soft:#1B2733;
+      --ok:#6FBE93;
+      --ok-soft:#173323;
+      --caution:#D9BB5C;
+      --caution-soft:#332A11;
+      --unknown:#9AA5B1;
+      --unknown-soft:#1E2530;
+      --restricted:#E38078;
+      --restricted-soft:#3A1917;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px -14px rgba(0,0,0,0.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0D1218;
+    --paper-raised:#161D26;
+    --ink:#E9EDF2;
+    --ink-soft:#9AA5B1;
+    --line:#2A3441;
+    --line-soft:#212933;
+    --accent:#E8944D;
+    --accent-ink:#FBD9B4;
+    --accent-soft:#3A2716;
+    --slate:#8FB0CC;
+    --slate-soft:#1B2733;
+    --ok:#6FBE93;
+    --ok-soft:#173323;
+    --caution:#D9BB5C;
+    --caution-soft:#332A11;
+    --unknown:#9AA5B1;
+    --unknown-soft:#1E2530;
+    --restricted:#E38078;
+    --restricted-soft:#3A1917;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px -14px rgba(0,0,0,0.6);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Public Sans', system-ui, -apple-system, sans-serif;
+    padding-inline:20px;
+    padding-block:32px;
+  }
+  .wrap{max-width:920px;margin:0 auto;}
+
+  h1,h2,h3{font-family:'Big Shoulders','Public Sans',sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:0.01em;text-wrap:balance;margin:0;}
+  .mono{font-family:'IBM Plex Mono',ui-monospace,monospace;}
+
+  /* header */
+  .app-header{display:flex;flex-direction:column;gap:6px;margin-bottom:28px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:8px;}
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;}
+  h1.title{font-size:clamp(28px,4.5vw,40px);line-height:1.05;color:var(--ink);}
+  .subtitle{color:var(--ink-soft);font-size:15px;max-width:60ch;line-height:1.5;margin-top:4px;}
+
+  .disclaimer{
+    display:flex;gap:10px;align-items:flex-start;
+    background:var(--slate-soft);border:1px solid var(--line);border-radius:10px;
+    padding:12px 14px;font-size:13px;line-height:1.5;color:var(--ink-soft);margin-top:16px;
+  }
+  .disclaimer strong{color:var(--ink);}
+
+  /* progress instrument */
+  .console{
+    display:flex;align-items:center;gap:0;
+    margin:28px 0 24px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+    background:var(--paper-raised);
+  }
+  .console .tick{
+    flex:1;
+    padding:10px 6px;
+    text-align:center;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:0.04em;
+    color:var(--unknown);
+    border-right:1px solid var(--line-soft);
+    position:relative;
+    text-transform:uppercase;
+  }
+  .console .tick:last-child{border-right:none;}
+  .console .tick.done{color:var(--ok);background:var(--ok-soft);}
+  .console .tick.active{color:var(--accent-ink);background:var(--accent-soft);font-weight:600;}
+  @media (max-width:640px){
+    .console{flex-wrap:wrap;}
+    .console .tick{flex:1 1 33.33%;border-bottom:1px solid var(--line-soft);padding:9px 4px;font-size:10px;}
+  }
+
+  /* card shell */
+  .panel{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:28px;
+  }
+  @media (max-width:560px){ .panel{padding:20px;} }
+
+  .step-label{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;}
+  .question{font-size:clamp(20px,3vw,26px);margin-bottom:4px;}
+  .question-hint{color:var(--ink-soft);font-size:14px;margin-top:6px;margin-bottom:22px;line-height:1.5;}
+
+  .options{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media (max-width:640px){ .options{grid-template-columns:1fr;} }
+  .options.single-col{grid-template-columns:1fr;}
+
+  .opt{
+    text-align:left;
+    border:1px solid var(--line);
+    background:var(--paper);
+    border-radius:10px;
+    padding:14px 16px;
+    cursor:pointer;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    font-family:inherit;
+    color:var(--ink);
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .opt:hover{border-color:var(--slate);}
+  .opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .opt .opt-title{font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px;}
+  .opt .opt-icon{font-size:18px;}
+  .opt .opt-desc{font-size:13px;color:var(--ink-soft);line-height:1.4;}
+  .opt.selected{border-color:var(--accent);background:var(--accent-soft);}
+  .opt.selected .opt-title{color:var(--accent-ink);}
+
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:26px;gap:12px;}
+  .btn{
+    font-family:'Public Sans',sans-serif;
+    font-weight:700;
+    font-size:14px;
+    border-radius:8px;
+    padding:11px 20px;
+    cursor:pointer;
+    border:1px solid transparent;
+  }
+  .btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .btn-primary{background:var(--ink);color:var(--paper);}
+  :root[data-theme="dark"] .btn-primary{background:var(--accent);color:#1A1006;}
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .btn-primary{background:var(--accent);color:#1A1006;} }
+  .btn-primary:disabled{opacity:0.4;cursor:not-allowed;}
+  .btn-ghost{background:transparent;color:var(--ink-soft);border-color:var(--line);}
+  .btn-ghost:hover{color:var(--ink);border-color:var(--slate);}
+
+  /* results */
+  .results-head{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+  .results-meta{display:flex;flex-wrap:wrap;gap:8px;}
+  .pill{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    letter-spacing:0.03em;
+    padding:5px 10px;
+    border-radius:999px;
+    background:var(--slate-soft);
+    color:var(--slate);
+    border:1px solid var(--line);
+  }
+
+  .warning-banner{
+    display:flex;gap:10px;background:var(--caution-soft);border:1px solid var(--caution);
+    color:var(--caution);border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.5;margin-bottom:20px;
+  }
+  .warning-banner strong{color:var(--ink);}
+  .warning-banner.restricted{background:var(--restricted-soft);border-color:var(--restricted);color:var(--restricted);}
+
+  .rank-group-title{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;
+    color:var(--ink-soft);margin:28px 0 12px;display:flex;align-items:center;gap:10px;
+  }
+  .rank-group-title::after{content:"";flex:1;height:1px;background:var(--line);}
+
+  .tool-card{
+    border:1px solid var(--line);border-radius:var(--radius);background:var(--paper-raised);
+    padding:20px 22px;margin-bottom:14px;box-shadow:var(--shadow);
+  }
+  .tool-head{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-start;}
+  .tool-name-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+  .tool-name{font-family:'Big Shoulders',sans-serif;font-weight:800;font-size:22px;text-transform:none;letter-spacing:0;}
+  .tool-vendor{font-size:12.5px;color:var(--ink-soft);}
+  .rank-badge{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent-ink);background:var(--accent-soft);
+    border:1px solid var(--accent);border-radius:6px;padding:2px 7px;white-space:nowrap;
+  }
+  .tool-tagline{color:var(--ink-soft);font-size:14px;margin-top:4px;max-width:60ch;line-height:1.5;}
+
+  .badge-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;}
+  .badge{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.02em;padding:4px 9px;border-radius:6px;border:1px solid transparent;}
+  .badge-ok{background:var(--ok-soft);color:var(--ok);border-color:var(--ok);}
+  .badge-caution{background:var(--caution-soft);color:var(--caution);border-color:var(--caution);}
+  .badge-unknown{background:var(--unknown-soft);color:var(--unknown);border-color:var(--unknown);}
+  .badge-neutral{background:var(--slate-soft);color:var(--slate);border-color:var(--line);}
+  .badge-restricted{background:var(--restricted-soft);color:var(--restricted);border-color:var(--restricted);}
+
+  .why-list{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:6px;}
+  .why-list li{font-size:13.5px;color:var(--ink);display:flex;gap:8px;line-height:1.45;}
+  .why-list li::before{content:"—";color:var(--accent);flex-shrink:0;}
+
+  details.more{margin-top:14px;border-top:1px solid var(--line-soft);padding-top:12px;}
+  details.more summary{cursor:pointer;font-weight:600;font-size:13.5px;color:var(--slate);list-style:none;display:flex;align-items:center;gap:6px;}
+  details.more summary::-webkit-details-marker{display:none;}
+  details.more summary::before{content:"▸";font-size:11px;transition:transform .15s ease;}
+  details.more[open] summary::before{transform:rotate(90deg);}
+  .more-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:18px;margin-top:14px;}
+  @media (max-width:640px){ .more-grid{grid-template-columns:1fr;} }
+  .more-block h4{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 8px;font-weight:600;}
+  .example-box{background:var(--paper);border:1px solid var(--line-soft);border-radius:8px;padding:12px 14px;font-size:13.5px;line-height:1.55;color:var(--ink);}
+  .steps{margin:0;padding-left:0;list-style:none;counter-reset:step;display:flex;flex-direction:column;gap:8px;}
+  .steps li{counter-increment:step;font-size:13.5px;line-height:1.5;padding-left:26px;position:relative;}
+  .steps li::before{content:counter(step);position:absolute;left:0;top:0;width:18px;height:18px;border-radius:50%;background:var(--slate-soft);color:var(--slate);font-family:'IBM Plex Mono',monospace;font-size:10.5px;display:flex;align-items:center;justify-content:center;}
+
+  .tool-footer{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:12px;flex-wrap:wrap;}
+  .visit-link{
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--slate);text-decoration:none;
+    border-bottom:1px solid var(--slate);padding-bottom:1px;
+  }
+  .visit-link:hover{color:var(--accent);border-color:var(--accent);}
+
+  .other-list{display:flex;flex-direction:column;gap:10px;}
+  .other-row{
+    display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+    border:1px solid var(--line-soft);border-radius:10px;padding:12px 16px;background:var(--paper-raised);
+  }
+  .other-row .oname{font-weight:700;font-size:14px;}
+  .other-row .otag{font-size:12px;color:var(--ink-soft);}
+  .other-row.needs-approval{border-color:var(--restricted);border-left:3px solid var(--restricted);}
+  .approval-side{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .security-link{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--restricted);
+    text-decoration:none;border-bottom:1px solid var(--restricted);padding-bottom:1px;white-space:nowrap;
+  }
+  .security-link:hover{color:var(--accent);border-color:var(--accent);}
+  .policy-note{color:var(--ink-soft);font-size:13px;line-height:1.55;margin:-6px 0 14px;max-width:70ch;}
+
+  .restart-row{display:flex;justify-content:center;margin-top:32px;}
+
+  .footer-note{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);color:var(--unknown);font-size:12px;font-family:'IBM Plex Mono',monospace;text-align:center;line-height:1.6;}
+
+  [hidden]{display:none!important;}
+</style>
+
+<div class="wrap">
+  <header class="app-header">
+    <span class="eyebrow"><span class="dot"></span>Zeitview · Internal Decision Support</span>
+    <h1 class="title">AI Tool Finder</h1>
+    <p class="subtitle">Find the right AI tool for a task, or check whether a specific app is already approved — and if not, see the closest approved alternative or request an IT review.</p>
+    <div class="disclaimer">
+      <span aria-hidden="true">✈</span>
+      <span><strong>Zeitview policy:</strong> confidential or customer data may only be processed with <strong>Claude Enterprise</strong>. For that classification, every other tool is shown with a "Request Security Approval" link instead of a direct recommendation. Elsewhere, the "data handling" badges describe each vendor's general enterprise controls, not an official approval — confirm with Security/IT before onboarding anything new.</span>
+    </div>
+  </header>
+
+  <div id="console" class="console" role="progressbar" aria-label="Wizard progress"></div>
+
+  <main id="stage" class="panel"></main>
+
+  <div class="footer-note">FLIGHT-CHECKED FOR ZEITVIEW · SPEC DATA IS A STARTING POINT, NOT A COMPLIANCE RULING · v1.0</div>
+</div>
+
+<script>
+(function(){
+
+/* ---------------------------------------------------------------------
+   DATA MODEL
+--------------------------------------------------------------------- */
+
+// rank scales
+const SKILL = { nocode:0, some:1, technical:2 };
+const BUDGET = { free:0, individual:1, team:2, enterprise:3 };
+const SENS = { public:0, internal:1, confidential:2 };
+const HANDLING = { consumer:0, business:1, enterprise:2 };
+
+const CATEGORIES = [
+  { id:'writing', icon:'✎', title:'Writing & Content', desc:'Drafting, editing, summarizing, marketing copy.' },
+  { id:'coding', icon:'⌁', title:'Coding & App Building', desc:'Write code, build a prototype or working app.' },
+  { id:'data', icon:'▦', title:'Data Analysis & Insights', desc:'Explore data, build dashboards, forecast.' },
+  { id:'creative', icon:'◈', title:'Image, Video & Design', desc:'Generate or edit images, video, audio, visuals.' },
+  { id:'automation', icon:'⇄', title:'Workflow Automation', desc:'Connect tools, automate a repeatable process.' },
+  { id:'research', icon:'⌕', title:'Research & Summarization', desc:'Search, synthesize, summarize information.' },
+  { id:'support', icon:'☍', title:'Chatbots & Support', desc:'Customer-facing or internal help chatbots.' },
+];
+
+const SUBTASKS = {
+  writing:   [ {id:'draft', label:'Draft something new', desc:'Emails, reports, docs from a rough idea.'},
+               {id:'edit', label:'Edit & polish existing text', desc:'Tighten tone, grammar, clarity.'},
+               {id:'marketing', label:'Marketing / brand copy', desc:'Ads, landing pages, campaigns.'},
+               {id:'summarize', label:'Summarize long documents', desc:'Turn long text into a short brief.'} ],
+  coding:    [ {id:'inline-help', label:'Help me while I code', desc:'Autocomplete & suggestions in my editor.'},
+               {id:'build-app', label:'Build an app from a description', desc:'Go from an idea to a working prototype.'},
+               {id:'script-automation', label:'Write a script to automate a task', desc:'One-off or scheduled technical scripts.'},
+               {id:'debug', label:'Debug or explain existing code', desc:'Understand or fix code that already exists.'} ],
+  data:      [ {id:'explore-analyze', label:'Explore & analyze a dataset', desc:'Find patterns, answer questions from data.'},
+               {id:'build-dashboard', label:'Build a dashboard or report', desc:'Recurring visual reporting.'},
+               {id:'smart-database', label:'Organize data in a smart database', desc:'Spreadsheet-like data with structure.'},
+               {id:'forecast', label:'Forecast or predict', desc:'Project trends forward from historical data.'} ],
+  creative:  [ {id:'still-image', label:'Generate or edit images', desc:'Illustrations, photos, graphics.'},
+               {id:'video', label:'Generate or edit video', desc:'Short clips, b-roll, edited footage.'},
+               {id:'voice-audio', label:'Generate voice or audio', desc:'Narration, voiceover, sound.'},
+               {id:'brand-design', label:'Templated brand / marketing design', desc:'Social posts, decks, one-pagers.'} ],
+  automation:[ {id:'connect-apps', label:'Connect apps & trigger actions', desc:'When X happens in App A, do Y in App B.'},
+               {id:'internal-process', label:'Automate an internal process', desc:'Approvals, intake forms, notifications.'},
+               {id:'custom-bot', label:'Build a bot for a repeatable task', desc:'A small agent that handles one job.'},
+               {id:'data-sync', label:'Move or sync data between systems', desc:'Keep two tools in agreement.'} ],
+  research:  [ {id:'web-research', label:'Search & synthesize the web', desc:'Answer a question using current sources.'},
+               {id:'doc-grounded', label:'Answer questions from my documents', desc:'Chat with a specific set of files.'},
+               {id:'meeting-notes', label:'Transcribe & summarize meetings', desc:'Calls, interviews, recordings.'},
+               {id:'fact-check', label:'Verify claims or citations', desc:'Check accuracy against sources.'} ],
+  support:   [ {id:'customer-chat', label:'Customer-facing chatbot', desc:'Answer customer questions automatically.'},
+               {id:'internal-helpdesk', label:'Internal employee helpdesk bot', desc:'IT / HR / ops questions for staff.'},
+               {id:'draft-responses', label:'Draft responses for agents', desc:'Suggested replies a human reviews.'},
+               {id:'ticket-routing', label:'Auto-route or triage tickets', desc:'Classify and send to the right queue.'} ],
+};
+
+const SKILL_OPTIONS = [
+  { id:'nocode', title:"I don't write code", desc:'Point-and-click tools only, please.' },
+  { id:'some', title:'Comfortable with settings', desc:'Spreadsheet formulas, no-code builders, basic config.' },
+  { id:'technical', title:'I can read or write code', desc:"I'm fine in an IDE, CLI, or API docs." },
+];
+
+const BUDGET_OPTIONS = [
+  { id:'free', title:'Free only', desc:'No spend, no approval needed.' },
+  { id:'individual', title:'Individual paid plan', desc:'~$10–30/mo, expensable on my own.' },
+  { id:'team', title:'Team / business plan', desc:'Company card, small group license.' },
+  { id:'enterprise', title:'Enterprise / custom build', desc:'Procurement, security review, or dev budget.' },
+];
+
+const SENS_OPTIONS = [
+  { id:'public', title:'Public or general info', desc:'Nothing confidential or customer-related.' },
+  { id:'internal', title:'Internal Zeitview data', desc:'Not customer-identifying, but not for outside eyes.' },
+  { id:'confidential', title:'Confidential / customer / PII', desc:'Customer data, PII, contracts, trade secrets.' },
+];
+
+const FREQ_OPTIONS = [
+  { id:'onetime', title:'One-time task', desc:"I just need this done once." },
+  { id:'occasional', title:'Occasionally', desc:'Comes up every now and then.' },
+  { id:'regular', title:'Regularly — worth automating', desc:"I'll do this often enough to set something up." },
+];
+
+const MODES = [
+  { id:'finder', icon:'✳', title:'Find the right AI tool', desc:'Answer a few questions about your task and get a ranked shortlist.' },
+  { id:'checker', icon:'❓', title:'Can I use this app?', desc:'Check whether a specific app is approved — or find the closest approved alternative.' },
+];
+
+function tierMax(tiers, key, userRank, rankMap){
+  const accessible = tiers.filter(t => BUDGET[t.budget] <= userRank);
+  if(!accessible.length) return null;
+  return accessible.reduce((max,t)=> Math.max(max, HANDLING[t.handling]), -1);
+}
+function minBudgetRank(tiers){ return Math.min(...tiers.map(t=>BUDGET[t.budget])); }
+
+// Zeitview policy: confidential/customer data is limited to Claude Enterprise.
+// TODO(Bruce): point this at your real Security intake — an email alias, a ticket
+// queue address, or swap securityApprovalHref() below for a link to that system.
+const SECURITY_APPROVAL_EMAIL = 'security@zeitview.com';
+
+function securityApprovalHref(tool, categoryTitle, sensitivityTitle, note){
+  const subject = `Security review request: ${tool.name} for ${categoryTitle}`;
+  const bodyLines = [
+    `Tool: ${tool.name} (${tool.vendor})`,
+    `Requested for: ${categoryTitle}`,
+    `Data classification: ${sensitivityTitle}`,
+    note ? `Note: ${note}` : null,
+    '',
+    'This tool was surfaced by the AI Tool Finder but does not currently meet the data-handling bar for this classification. Requesting a Security review before use.',
+  ].filter(Boolean);
+  return `mailto:${SECURITY_APPROVAL_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines.join('\n'))}`;
+}
+
+function appReviewHref(appName, categoryTitle, sensitivityTitle){
+  const subject = `New app review request: ${appName}`;
+  const bodyLines = [
+    `App: ${appName}`,
+    `Intended use / category: ${categoryTitle || '(not specified)'}`,
+    `Data classification: ${sensitivityTitle}`,
+    '',
+    'This app is not currently in the AI Tool Finder catalog. Requesting a Security/IT review before use.',
+  ];
+  return `mailto:${SECURITY_APPROVAL_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines.join('\n'))}`;
+}
+
+function escapeHtml(str){ const d=document.createElement('div'); d.textContent = str; return d.innerHTML; }
+
+// Tool catalog -----------------------------------------------------------
+const TOOLS = [
+  {
+    id:'chatgpt', name:'ChatGPT', vendor:'OpenAI', url:'https://chatgpt.com',
+    tagline:'General-purpose chat assistant for writing, code, data, and research.',
+    categories:['writing','coding','data','research','support'],
+    subtasks:{ writing:['draft','edit','marketing','summarize'], coding:['inline-help','build-app','script-automation','debug'], data:['explore-analyze','forecast'], research:['web-research','doc-grounded'], support:['draft-responses'] },
+    skillMin:'nocode',
+    tiers:[ {budget:'free',handling:'consumer',label:'Free'}, {budget:'individual',handling:'consumer',label:'Plus ($20/mo)'}, {budget:'team',handling:'enterprise',label:'Team'}, {budget:'enterprise',handling:'enterprise',label:'Enterprise'} ],
+    ongoingFit:true, setupHeavy:false,
+    example:{ writing:'Paste a rough incident summary and ask for a client-ready email in Zeitview\'s tone.', coding:'Describe a report-formatting script in plain English and get a working Python draft.', data:'Upload a CSV of inspection findings and ask which sites have recurring issues.', research:'Ask it to pull together what changed in a regulation and summarize the implications.', support:'Draft three response options for a recurring customer question.' },
+    why:{ writing:'Fast, flexible drafting with a huge range of tone and format control.', coding:'Code Interpreter and plugins make it a strong generalist coding assistant.', data:'Built-in data analysis mode reads spreadsheets and writes its own analysis code.', research:'Browsing mode plus strong synthesis for open-ended questions.', support:'Good at producing several response drafts fast for an agent to choose from.' },
+    steps:['Sign in with a work or personal account depending on plan.','Start a chat and describe the task in plain language, including format and audience.','Iterate — ask it to shorten, formalize, or restructure the draft.','For sensitive data, use only a Team/Enterprise workspace, never the free/Plus consumer tier.']
+  },
+  {
+    id:'claude', name:'Claude', vendor:'Anthropic', url:'https://claude.ai',
+    tagline:'Assistant built for careful long-form writing, analysis, and coding.',
+    categories:['writing','coding','data','research'],
+    subtasks:{ writing:['draft','edit','summarize'], coding:['inline-help','build-app','script-automation','debug'], data:['explore-analyze'], research:['web-research','doc-grounded','fact-check'] },
+    skillMin:'nocode',
+    tiers:[ {budget:'free',handling:'consumer',label:'Free'}, {budget:'individual',handling:'consumer',label:'Pro ($20/mo)'}, {budget:'team',handling:'enterprise',label:'Team'}, {budget:'enterprise',handling:'enterprise',label:'Enterprise'} ],
+    ongoingFit:true, setupHeavy:false,
+    example:{ writing:'Feed it a messy policy draft and ask for a clean, structured rewrite with tracked reasoning.', coding:'Hand it an existing script and ask for a refactor with an explanation of each change.', data:'Upload a spreadsheet of flight/inspection logs and ask for an analysis with a chart.', research:'Ground it in a folder of source documents (Projects) and ask questions only from those.' },
+    why:{ writing:'Strong at long documents, nuance, and keeping a consistent structure.', coding:'Claude Code extends this into full agentic coding sessions in a terminal or IDE.', data:'Handles large documents and spreadsheets well, with transparent step-by-step reasoning.', research:'Projects let you ground answers strictly in documents you provide, reducing hallucination risk.' },
+    steps:['Sign in and start a chat, or open a Project to ground it in specific documents.','Describe the task and paste or upload the source material.','Ask follow-up questions to refine — it holds context well across a long thread.','Use a Team/Enterprise workspace for anything beyond public information.']
+  },
+  {
+    id:'gemini', name:'Gemini', vendor:'Google', url:'https://gemini.google.com',
+    tagline:"Google's assistant, deeply integrated with Workspace (Docs, Sheets, Gmail).",
+    categories:['writing','coding','data','research','support'],
+    subtasks:{ writing:['draft','edit','summarize'], coding:['inline-help','debug'], data:['explore-analyze','build-dashboard'], research:['web-research','meeting-notes'], support:['draft-responses'] },
+    skillMin:'nocode',
+    tiers:[ {budget:'free',handling:'consumer',label:'Free'}, {budget:'individual',handling:'consumer',label:'Google AI Pro'}, {budget:'team',handling:'business',label:'Workspace add-on'}, {budget:'enterprise',handling:'enterprise',label:'Workspace Enterprise'} ],
+    ongoingFit:true, setupHeavy:false,
+    example:{ writing:'Right inside Gmail, ask it to draft a reply using the thread as context.', coding:'Ask for a quick Apps Script to automate a Sheet you already use.', data:'In Sheets, ask it to summarize a column of inspection notes into categories.', research:'Summarize a long email thread or set of linked Docs into a decision log.', support:'Draft support replies directly from a Gmail thread.' },
+    why:{ writing:'No extra login — it lives inside the Docs, Sheets, and Gmail people already use.', coding:'Handy for small Apps Script automations tied to Workspace files.', data:'Works natively on live Sheets data without exporting anything.', research:'Strong at summarizing across your own Gmail/Docs/Drive content.', support:'Drafts replies in context without leaving the inbox.' },
+    steps:['Confirm whether Zeitview\'s Workspace plan includes Gemini (check with IT).','Open it from the side panel in Docs, Sheets, or Gmail, or use gemini.google.com directly.','Ask it to work with the content of the open file for the most relevant results.','Prefer the Workspace-integrated tier over a personal Google account for company data.']
+  },
+  {
+    id:'perplexity', name:'Perplexity', vendor:'Perplexity AI', url:'https://perplexity.ai',
+    tagline:'Search-first AI that answers questions with cited sources.',
+    categories:['research'],
+    subtasks:{ research:['web-research','fact-check'] },
+    skillMin:'nocode',
+    tiers:[ {budget:'free',handling:'consumer',label:'Free'}, {budget:'individual',handling:'consumer',label:'Pro ($20/mo)'}, {budget:'enterprise',handling:'enterprise',label:'Enterprise Pro'} ],
+    ongoingFit:true, setupHeavy:false,
+    example:{ research:'Ask "what changed in FAA Part 107 rules this year" and get a cited, current answer.' },
+    why:{ research:'Every answer comes with linked sources, which makes it easy to verify before citing it externally.' },
+    steps:['Go to perplexity.ai and ask your question directly — no setup required.','Check the cited sources before using the answer in anything client-facing.','Use "Focus" filters to restrict search to academic, news, or specific source types.']
+  },
+  {
+    id:'notebooklm', name:'NotebookLM', vendor:'Google', url:'https://notebooklm.google.com',
+    tagline:'Upload your own documents and get answers grounded only in them.',
+    categories:['research','writing'],
+    subtasks:{ research:['doc-grounded','fact-check'], writing:['summarize'] },
+    skillMin:'nocode',
+    tiers:[ {budget:'free',handling:'consumer',label:'Free'}, {budget:'team',handling:'business',label:'Via Workspace'} ],
+    ongoingFit:true, setupHeavy:false,
+    example:{ research:'Upload a stack of vendor contracts and ask it to compare termination clauses, with citations back to the exact page.', writing:'Turn a pile of source PDFs into a briefing summary with an audio overview.' },
+    why:{ research:'Answers are grounded strictly in the documents you upload, with inline citations — low hallucination risk.', writing:'Its "audio overview" feature turns dense source material into a digestible briefing fast.' },
+    steps:['Create a notebook and upload the source documents (PDFs, Docs, slides, links).','Ask questions — every answer links back to the specific source passage.','Use the generated summary or audio overview as a first-pass briefing, not a final citation.']
+  },
+  {
+    id:'grammarly', name:'Grammarly', vendor:'Grammarly', url:'https://grammarly.com',
+    tagline:'Grammar, tone, and clarity checking as you type.',
+    categories:['writing'],
+    subtasks:{ writing:['edit'] },
+    skillMin:'nocode',
+    tiers:[ {budget:'free',handling:'consumer',label:'Free'}, {budget:'individual',handling:'consumer',label:'Premium'}, {budget:'team',handling:'business',label:'Business'} ],
+    ongoingFit:true, setupHeavy:false,
+    example:{ writing:'Turns on automatically in Gmail or a Google Doc and flags tone/clarity issues as you write a client email.' },
+    why:{ writing:'Lightweight, works everywhere you already type, and needs zero prompting.' },
+    steps:['Install the browser extension or desktop app.','Write normally — it underlines suggestions inline.','Set tone goals (e.g. "formal", "confident") in the sidebar for more targeted suggestions.']
+  },
+  {
+    id:'jasper', name:'Jasper', vendor:'Jasper AI', url:'https://jasper.ai',
+    tagline:'Marketing-focused copywriting with brand voice controls.',
+    categories:['writing'],
+    subtasks:{ writing:['marketing','draft'] },
+    skillMin:'nocode',
+    tiers:[ {budget:'individual',handling:'consumer',label:'Creator'}, {budget:'team',handling:'business',label:'Team'}, {budget:'enterprise',handling:'enterprise',label:'Business'} ],
+    ongoingFit:true, setupHeavy:false,
+    example:{ writing:'Generate a set of on-brand social captions and ad variants from one campaign brief.' },
+    why:{ writing:'Brand-voice profiles keep output consistent across a marketing team, unlike a general chatbot.' },
+    steps:['Set up a Brand Voice profile from existing marketing material.','Pick a campaign template or start from a blank brief.','Generate variants, then hand-edit the strongest ones.']
+  },
+  {
+    id:'copyai', name:'Copy.ai', vendor:'Copy.ai', url:'https://copy.ai',
+    tagline:'Marketing copy generation with light workflow automation.',
+    categories:['writing','automation'],
+    subtasks:{ writing:['marketing','draft'], automation:['internal-process'] },
+    skillMin:'nocode',
+    tiers:[ {budget:'free',handling:'consumer',label:'Free'}, {budget:'individual',handling:'consumer',label:'Starter'}, {budget:'team',handling:'business',label:'Team'} ],
+    ongoingFit:true, setupHeavy:false,
+    example:{ writing:'Turn one product description into ad copy for five different channels at once.', automation:'Chain a research step and a writing step into one repeatable "workflow" for content requests.' },
+    why:{ writing:'Purpose-built templates for common marketing copy formats.', automation:'Its Workflows feature adds light multi-step automation without needing a separate tool.' },
+    steps:['Pick a template (ad copy, product description, etc.) or build a Workflow.','Fill in the product/campaign details.','Review and edit generated variants before publishing.']
+  },
+  {
+    id:'notionai', name:'Notion AI', vendor:'Notion', url:'https://notion.so/product/ai',
+    tagline:'AI built into Notion docs, databases, and pages.',
+    categories:['writing','data','automation'],
+    subtasks:{ writing:['draft','summarize'], data:['smart-database'], automation:['internal-process'] },
+    skillMin:'nocode',
+    tiers:[ {budget:'individual',handling:'consumer',label:'Plus add-on'}, {budget:'team',handling:'business',label:'Business'}, {budget:'enterprise',handling:'enterprise',label:'Enterprise'} ],
+    ongoingFit:true, setupHeavy:false,
+    example:{ writing:'Summarize a long meeting notes page into action items automatically.', data:'Ask questions across your whole Notion workspace and get an answer with linked sources.', automation:'Auto-fill a database property (like status or category) using AI as new rows are added.' },
+    why:{ writing:'Summaries and drafts live right next to the source doc, no copy-pasting.', data:'"Notion Q&A" searches your whole workspace like a personal knowledge base.', automation:'Database automations plus AI cut down on manual tagging/categorizing.' },
+    steps:['Turn on the AI add-on for your workspace.','Use the AI block inside any page, or ask Q&A from the sidebar.','For databases, set AI-powered autofill on a property to keep it current automatically.']
+  },
+  {
+    id:'cursor', name:'Cursor', vendor:'Anysphere', url:'https://cursor.com',
+    tagline:'A code editor built around an AI agent that edits multi-file projects.',
+    categories:['coding'],
+    subtasks:{ coding:['build-app','debug','inline-help'] },
+    skillMin:'technical',
+    tiers:[ {budget:'free',handling:'consumer',label:'Hobby (free)'}, {budget:'individual',handling:'consumer',label:'Pro'}, {budget:'team',handling:'business',label:'Business'} ],
+    ongoingFit:true, setupHeavy:true,
+    example:{ coding:'Describe a feature in plain English and let the agent edit several files at once to implement it.' },
+    why:{ coding:'Goes beyond autocomplete — its agent mode can plan and execute changes across a whole codebase.' },
+    steps:['Download Cursor and open your project folder (it\'s a VS Code fork, so settings/extensions carry over).','Use Chat/Agent mode and describe the change you want in plain language.','Review the diff before accepting — it shows exactly what it changed and why.']
+  },
+  {
+    id:'claudecode', name:'Claude Code', vendor:'Anthropic', url:'https://claude.com/claude-code',
+    tagline:'Agentic coding in your terminal — plans, edits, tests, and runs commands.',
+    categories:['coding'],
+    subtasks:{ coding:['build-app','script-automation','debug'] },
+    skillMin:'technical',
+    tiers:[ {budget:'individual',handling:'consumer',label:'Included with Pro'}, {budget:'team',handling:'enterprise',label:'Team'}, {budget:'enterprise',handling:'enterprise',label:'Enterprise'} ],
+    ongoingFit:true, setupHeavy:true,
+    example:{ coding:'Point it at a repo and ask it to add a feature end-to-end — it reads the code, writes changes, and runs the tests itself.' },
+    why:{ coding:'Handles multi-step engineering work autonomously, not just single suggestions — good for larger, self-contained tasks.' },
+    steps:['Install the CLI (npm install -g via docs) and sign in.','Run it from inside a project repo.','Describe the task; review each proposed change before it\'s applied.']
+  },
+  {
+    id:'replit', name:'Replit', vendor:'Replit', url:'https://replit.com',
+    tagline:'Browser-based coding environment with an AI agent that builds full apps.',
+    categories:['coding','automation'],
+    subtasks:{ coding:['build-app'], automation:['custom-bot'] },
+    skillMin:'some',
+    tiers:[ {budget:'free',handling:'consumer',label:'Free'}, {budget:'individual',handling:'consumer',label:'Core'}, {budget:'team',handling:'business',label:'Teams'} ],
+    ongoingFit:true, setupHeavy:false,
+    example:{ coding:'Describe a small internal tool (e.g. "a form that logs inspection issues to a table") and get a working, hosted app.', automation:'Build and host a small scheduled script without managing any infrastructure.' },
+    why:{ coding:'Lowest-friction way to go from an idea to a hosted, working app — nothing to install.', automation:'Good for a small internal bot or scheduled job you don\'t want to run your own server for.' },
+    steps:['Create a Repl and describe what you want to build to the Agent.','Let it scaffold the app, then test it in the built-in preview.','Publish/deploy from the same interface when it\'s ready.']
+  },
+  {
+    id:'v0', name:'v0', vendor:'Vercel', url:'https://v0.dev',
+    tagline:'Generates real front-end UI code from a text or image prompt.',
+    categories:['coding'],
+    subtasks:{ coding:['build-app'] },
+    skillMin:'some',
+    tiers:[ {budget:'free',handling:'consumer',label:'Free'}, {budget:'individual',handling:'consumer',label:'Premium'}, {budget:'team',handling:'business',label:'Team'} ],
+    ongoingFit:false, setupHeavy:false,
+    example:{ coding:'Describe a dashboard layout and get real, editable React/Tailwind code you can drop into a project.' },
+    why:{ coding:'Produces clean, actually-usable front-end code rather than a mockup image.' },
+    steps:['Describe the UI you want, or upload a screenshot/sketch.','Iterate in chat to adjust layout, copy, and components.','Export the generated code into your own project.']
+  },
+  {
+    id:'lovable', name:'Lovable', vendor:'Lovable', url:'https://lovable.dev',
+    tagline:'Describe an app in plain English; get a working full-stack app back.',
+    categories:['coding'],
+    subtasks:{ coding:['build-app'] },
+    skillMin:'nocode',
+    tiers:[ {budget:'free',handling:'consumer',label:'Free'}, {budget:'individual',handling:'consumer',label:'Starter'}, {budget:'team',handling:'business',label:'Launch'} ],
+    ongoingFit:false, setupHeavy:false,
+    example:{ coding:'Describe "an internal tool where field techs log completed inspections with photos" and get a working app with a database, no coding required.' },
+    why:{ coding:'The most no-code-friendly of the AI app builders — genuinely usable without programming experience.' },
+    steps:['Describe the app you want in plain language.','Use chat to refine screens, fields, and logic.','Publish directly, or export the code if a developer wants to take it further.']
+  },
+  {
+    id:'airtable', name:'Airtable', vendor:'Airtable', url:'https://airtable.com',
+    tagline:'Spreadsheet-database hybrid with AI fields and automations.',
+    categories:['data','automation'],
+    subtasks:{ data:['smart-database','build-dashboard'], automation:['internal-process','data-sync'] },
+    skillMin:'nocode',
+    tiers:[ {budget:'free',handling:'consumer',label:'Free'}, {budget:'individual',handling:'business',label:'Team'}, {budget:'team',handling:'business',label:'Business'}, {budget:'enterprise',handling:'enterprise',label:'Enterprise'} ],
+    ongoingFit:true, setupHeavy:true,
+    example:{ data:'Track inspection sites as records, with an AI field that auto-summarizes each site\'s issue history.', automation:'Auto-notify a channel when a record\'s status changes to "needs review".' },
+    why:{ data:'Structured like a database but as approachable as a spreadsheet — good for ongoing tracking, not one-off analysis.', automation:'Built-in automations trigger off record changes without any external tool.' },
+    steps:['Build or import a base (table) for the data you\'re tracking.','Add an AI field to summarize, categorize, or generate text per row.','Set up an automation to trigger on the changes you care about.']
+  },
+  {
+    id:'julius', name:'Julius AI', vendor:'Julius', url:'https://julius.ai',
+    tagline:'Chat with your data — upload a file and ask questions in plain English.',
+    categories:['data'],
+    subtasks:{ data:['explore-analyze','forecast'] },
+    skillMin:'nocode',
+    tiers:[ {budget:'free',handling:'consumer',label:'Free'}, {budget:'individual',handling:'consumer',label:'Plus'} ],
+    ongoingFit:false, setupHeavy:false,
+    example:{ data:'Upload a CSV export and ask "which region had the most repeat issues this quarter", get a chart back.' },
+    why:{ data:'Lowest-friction way for a non-technical person to get real statistical answers from a spreadsheet.' },
+    steps:['Upload a CSV or Excel file.','Ask your question in plain English.','Ask follow-ups to drill into anything that looks interesting — it remembers context.']
+  },
+  {
+    id:'midjourney', name:'Midjourney', vendor:'Midjourney, Inc.', url:'https://midjourney.com',
+    tagline:'The highest-quality AI image generator, prompt-driven.',
+    categories:['creative'],
+    subtasks:{ creative:['still-image','brand-design'] },
+    skillMin:'some',
+    tiers:[ {budget:'individual',handling:'consumer',label:'Basic'}, {budget:'team',handling:'consumer',label:'Pro'} ],
+    ongoingFit:true, setupHeavy:false,
+    example:{ creative:'Generate concept art or a striking hero image for a presentation or landing page.' },
+    why:{ creative:'Still the benchmark for image quality and style control, though it takes some prompt practice.' },
+    steps:['Join via Discord or the web app and subscribe to a plan (no free tier).','Write a prompt describing subject, style, and mood.','Upscale and refine your favorite of the generated variations.']
+  },
+  {
+    id:'firefly', name:'Adobe Firefly', vendor:'Adobe', url:'https://firefly.adobe.com',
+    tagline:'Commercially-safe AI image generation, integrated into Creative Cloud.',
+    categories:['creative'],
+    subtasks:{ creative:['still-image','brand-design'] },
+    skillMin:'nocode',
+    tiers:[ {budget:'free',handling:'consumer',label:'Free'}, {budget:'individual',handling:'consumer',label:'Premium'}, {budget:'enterprise',handling:'enterprise',label:'Enterprise'} ],
+    ongoingFit:true, setupHeavy:false,
+    example:{ creative:'Generate a marketing background image with IP indemnification suitable for external client use.' },
+    why:{ creative:'Trained on licensed content with commercial-use indemnification — the safer choice for anything client-facing.' },
+    steps:['Open Firefly directly, or the Generative Fill/Expand tools inside Photoshop.','Describe or sketch what you want.','For external/client use, prefer this over consumer tools for IP safety.']
+  },
+  {
+    id:'canva', name:'Canva Magic Studio', vendor:'Canva', url:'https://canva.com',
+    tagline:'Easy templated design with AI generation baked in.',
+    categories:['creative','writing'],
+    subtasks:{ creative:['brand-design','still-image'], writing:['draft'] },
+    skillMin:'nocode',
+    tiers:[ {budget:'free',handling:'consumer',label:'Free'}, {budget:'individual',handling:'business',label:'Pro'}, {budget:'team',handling:'business',label:'Teams'}, {budget:'enterprise',handling:'enterprise',label:'Enterprise'} ],
+    ongoingFit:true, setupHeavy:false,
+    example:{ creative:'Turn a one-line brief into a full social post or one-pager using Magic Design templates.', writing:'Generate first-draft copy directly inside a design layout.' },
+    why:{ creative:'Fastest path from idea to a polished, on-brand visual for anyone without design training.', writing:'Handy when the copy and the visual need to be produced together.' },
+    steps:['Start from a template or describe what you need to Magic Design.','Customize with your own text, images, and brand kit.','Download or share the finished design directly.']
+  },
+  {
+    id:'runway', name:'Runway', vendor:'Runway', url:'https://runwayml.com',
+    tagline:'AI video generation and editing tools.',
+    categories:['creative'],
+    subtasks:{ creative:['video'] },
+    skillMin:'some',
+    tiers:[ {budget:'free',handling:'consumer',label:'Free'}, {budget:'individual',handling:'consumer',label:'Standard'}, {budget:'team',handling:'business',label:'Unlimited'}, {budget:'enterprise',handling:'enterprise',label:'Enterprise'} ],
+    ongoingFit:true, setupHeavy:false,
+    example:{ creative:'Generate a short establishing shot or b-roll clip to open an internal training video.' },
+    why:{ creative:'One of the more capable text-to-video tools, plus solid editing features like green-screen and slow-mo.' },
+    steps:['Choose a tool (Gen-3 video generation, or an editing tool) from the dashboard.','Describe the clip or upload footage to edit.','Export at the resolution your final format needs.']
+  },
+  {
+    id:'synthesia', name:'Synthesia', vendor:'Synthesia', url:'https://synthesia.io',
+    tagline:'Turn a script into a video with an AI presenter avatar.',
+    categories:['creative','writing'],
+    subtasks:{ creative:['video'], writing:['draft'] },
+    skillMin:'nocode',
+    tiers:[ {budget:'individual',handling:'business',label:'Starter'}, {budget:'team',handling:'business',label:'Creator'}, {budget:'enterprise',handling:'enterprise',label:'Enterprise'} ],
+    ongoingFit:true, setupHeavy:false,
+    example:{ creative:'Turn a written safety-training script into a narrated video with an on-screen presenter, no filming required.' },
+    why:{ creative:'Removes filming/editing entirely for training or explainer content — just needs a script.' },
+    steps:['Write or paste your script.','Pick an avatar, voice, and template.','Generate the video and download or share the link.']
+  },
+  {
+    id:'elevenlabs', name:'ElevenLabs', vendor:'ElevenLabs', url:'https://elevenlabs.io',
+    tagline:'Realistic AI voice generation and cloning.',
+    categories:['creative'],
+    subtasks:{ creative:['voice-audio'] },
+    skillMin:'nocode',
+    tiers:[ {budget:'free',handling:'consumer',label:'Free'}, {budget:'individual',handling:'consumer',label:'Starter/Creator'}, {budget:'team',handling:'business',label:'Business'}, {budget:'enterprise',handling:'enterprise',label:'Enterprise'} ],
+    ongoingFit:true, setupHeavy:false,
+    example:{ creative:'Generate a natural-sounding narration track for a training video from a text script.' },
+    why:{ creative:'The most natural-sounding voice generation available, with dozens of ready-made voices.' },
+    steps:['Paste in the script text.','Choose a voice (or clone one, with proper consent/rights).','Generate and download the audio file.']
+  },
+  {
+    id:'zapier', name:'Zapier', vendor:'Zapier', url:'https://zapier.com',
+    tagline:'Connect thousands of apps with no-code triggers and actions.',
+    categories:['automation'],
+    subtasks:{ automation:['connect-apps','data-sync','internal-process'] },
+    skillMin:'nocode',
+    tiers:[ {budget:'free',handling:'consumer',label:'Free'}, {budget:'individual',handling:'consumer',label:'Professional'}, {budget:'team',handling:'business',label:'Team'}, {budget:'enterprise',handling:'enterprise',label:'Enterprise'} ],
+    ongoingFit:true, setupHeavy:true,
+    example:{ automation:'When a new row is added to a form response sheet, automatically create a task and post a Slack notification.' },
+    why:{ automation:'The widest app library of any no-code automation tool — if it exists, Zapier probably connects to it.' },
+    steps:['Pick a trigger app and event ("New form response").','Add one or more action steps ("Create task", "Send Slack message").','Test the Zap, then turn it on.']
+  },
+  {
+    id:'make', name:'Make', vendor:'Make (Integromat)', url:'https://make.com',
+    tagline:'Visual, flowchart-style automation builder for more complex logic.',
+    categories:['automation'],
+    subtasks:{ automation:['connect-apps','data-sync','internal-process'] },
+    skillMin:'some',
+    tiers:[ {budget:'free',handling:'consumer',label:'Free'}, {budget:'individual',handling:'consumer',label:'Core'}, {budget:'team',handling:'business',label:'Teams'}, {budget:'enterprise',handling:'enterprise',label:'Enterprise'} ],
+    ongoingFit:true, setupHeavy:true,
+    example:{ automation:'Build a multi-branch workflow that routes a new lead differently depending on region and deal size.' },
+    why:{ automation:'Visual canvas makes branching, multi-step logic easier to design and debug than a linear tool.' },
+    steps:['Start a new scenario and add your trigger module.','Add and connect action modules on the visual canvas, including branches/filters.','Run a test, then schedule or activate the scenario.']
+  },
+  {
+    id:'n8n', name:'n8n', vendor:'n8n', url:'https://n8n.io',
+    tagline:'Open-source automation platform, self-hostable for full data control.',
+    categories:['automation','coding'],
+    subtasks:{ automation:['connect-apps','data-sync','custom-bot'], coding:['script-automation'] },
+    skillMin:'some',
+    tiers:[ {budget:'free',handling:'enterprise',label:'Self-hosted (free)'}, {budget:'individual',handling:'business',label:'Cloud Starter'}, {budget:'team',handling:'business',label:'Cloud Business'}, {budget:'enterprise',handling:'enterprise',label:'Enterprise (self-hosted)'} ],
+    ongoingFit:true, setupHeavy:true,
+    example:{ automation:'Self-host a workflow that processes inbound files and never sends the data to a third-party cloud.', coding:'Add a custom JavaScript step mid-workflow for logic the visual builder can\'t express.' },
+    why:{ automation:'Self-hosting means sensitive data never has to leave infrastructure you control — the strongest option here for confidential workflows.', coding:'Drop-in code nodes give it near-unlimited flexibility for anyone comfortable scripting.' },
+    steps:['Choose self-hosted (needs IT/dev support to stand up) or n8n Cloud.','Build the workflow visually, adding a Code node wherever logic gets complex.','Test, then activate the workflow on a schedule or webhook trigger.']
+  },
+  {
+    id:'otter', name:'Otter.ai', vendor:'Otter.ai', url:'https://otter.ai',
+    tagline:'Real-time meeting transcription and summarization.',
+    categories:['research','writing'],
+    subtasks:{ research:['meeting-notes'], writing:['summarize'] },
+    skillMin:'nocode',
+    tiers:[ {budget:'free',handling:'consumer',label:'Free'}, {budget:'individual',handling:'consumer',label:'Pro'}, {budget:'team',handling:'business',label:'Business'}, {budget:'enterprise',handling:'enterprise',label:'Enterprise'} ],
+    ongoingFit:true, setupHeavy:false,
+    example:{ research:'Auto-join a recurring stakeholder call and produce a shareable summary with action items afterward.', writing:'Turn a rambling voice memo into a clean written summary.' },
+    why:{ research:'Joins calls automatically and separates speakers, which is a genuine time-saver for recurring meetings.', writing:'One of the more reliable transcript-to-summary pipelines for spoken content.' },
+    steps:['Connect your calendar or invite the Otter bot to a specific meeting.','Let it record, transcribe, and summarize automatically.','Share or edit the summary and action items afterward.']
+  },
+];
+
+/* ---------------------------------------------------------------------
+   WIZARD STATE
+--------------------------------------------------------------------- */
+
+const STEPS = ['category','subtask','skill','budget','sensitivity','frequency','results'];
+const STEP_LABELS = { category:'Task', subtask:'Specifics', skill:'Skill', budget:'Budget', sensitivity:'Data', frequency:'Frequency', results:'Results' };
+
+const CHECKER_STEPS = ['appname','category','sensitivity','results'];
+const CHECKER_STEP_LABELS = { appname:'App', category:'Category', sensitivity:'Data', results:'Results' };
+
+let state = { mode:null, step:0, category:null, subtask:null, skill:null, budget:null, sensitivity:null, frequency:null, checkerStep:0, appName:'', appCategory:null, appSensitivity:null };
+
+const stageEl = document.getElementById('stage');
+const consoleEl = document.getElementById('console');
+
+function renderConsole(stepsList, labelsMap, idx){
+  consoleEl.innerHTML = '';
+  stepsList.forEach((s,i)=>{
+    const d = document.createElement('div');
+    d.className = 'tick' + (i < idx ? ' done' : i === idx ? ' active' : '');
+    d.textContent = (i+1) + '·' + labelsMap[s];
+    consoleEl.appendChild(d);
+  });
+}
+
+function goTo(step){ state.step = step; render(); window.scrollTo({top:0, behavior:'smooth'}); }
+function next(){ if(state.step < STEPS.length-1) goTo(state.step+1); }
+function back(){ if(state.step > 0){ goTo(state.step-1); } else { goToMenu(); } }
+function restart(){ state = { ...state, step:0, category:null, subtask:null, skill:null, budget:null, sensitivity:null, frequency:null }; render(); window.scrollTo({top:0, behavior:'smooth'}); }
+
+function goToMenu(){ state.mode = null; render(); window.scrollTo({top:0, behavior:'smooth'}); }
+function checkerNext(){ if(state.checkerStep < CHECKER_STEPS.length-1){ state.checkerStep++; render(); window.scrollTo({top:0, behavior:'smooth'}); } }
+function checkerBack(){ if(state.checkerStep > 0){ state.checkerStep--; render(); } else { goToMenu(); } window.scrollTo({top:0, behavior:'smooth'}); }
+function checkerRestart(){ state.checkerStep = 0; state.appName=''; state.appCategory=null; state.appSensitivity=null; render(); window.scrollTo({top:0, behavior:'smooth'}); }
+
+function optionCard(opt, selected, onClick, iconField){
+  const b = document.createElement('button');
+  b.type='button';
+  b.className = 'opt' + (selected ? ' selected' : '');
+  b.setAttribute('role','radio');
+  b.setAttribute('aria-checked', selected ? 'true':'false');
+  b.innerHTML = `<span class="opt-title">${iconField && opt.icon ? `<span class="opt-icon">${opt.icon}</span>`:''}${opt.title||opt.label}</span><span class="opt-desc">${opt.desc}</span>`;
+  b.addEventListener('click', onClick);
+  return b;
+}
+
+function renderQuestionStep({label, question, hint, options, selectedId, onSelect, singleCol, useIcon, onBack=back, onNext=next, backDisabled=false, nextDisabled}){
+  stageEl.innerHTML = '';
+  const stepLabel = document.createElement('div'); stepLabel.className='step-label mono'; stepLabel.textContent = label;
+  const q = document.createElement('h2'); q.className='question'; q.textContent = question;
+  stageEl.appendChild(stepLabel); stageEl.appendChild(q);
+  if(hint){ const h = document.createElement('p'); h.className='question-hint'; h.textContent = hint; stageEl.appendChild(h); }
+
+  const grid = document.createElement('div');
+  grid.className = 'options' + (singleCol ? ' single-col':'');
+  grid.setAttribute('role','radiogroup');
+  options.forEach(opt=>{
+    const card = optionCard(opt, opt.id===selectedId, ()=>{ onSelect(opt.id); }, useIcon);
+    grid.appendChild(card);
+  });
+  stageEl.appendChild(grid);
+
+  const nav = document.createElement('div'); nav.className='nav-row';
+  const backBtn = document.createElement('button'); backBtn.className='btn btn-ghost'; backBtn.textContent='← Back';
+  backBtn.disabled = backDisabled;
+  backBtn.addEventListener('click', onBack);
+  const nextBtn = document.createElement('button'); nextBtn.className='btn btn-primary'; nextBtn.id='nextBtn'; nextBtn.textContent='Continue →';
+  nextBtn.disabled = nextDisabled !== undefined ? nextDisabled : !selectedId;
+  nextBtn.addEventListener('click', onNext);
+  nav.appendChild(backBtn); nav.appendChild(nextBtn);
+  stageEl.appendChild(nav);
+}
+
+function renderModeSelect(){
+  stageEl.innerHTML = '';
+  const stepLabel = document.createElement('div'); stepLabel.className='step-label mono'; stepLabel.textContent = 'Start';
+  const q = document.createElement('h2'); q.className='question'; q.textContent = 'What do you need?';
+  const hint = document.createElement('p'); hint.className='question-hint'; hint.textContent = 'Pick one — you can switch any time.';
+  stageEl.appendChild(stepLabel); stageEl.appendChild(q); stageEl.appendChild(hint);
+
+  const grid = document.createElement('div'); grid.className='options single-col'; grid.setAttribute('role','radiogroup');
+  MODES.forEach(m=>{
+    const card = optionCard(m, false, ()=>{
+      state.mode = m.id;
+      if(m.id === 'finder'){ state.step = 0; }
+      else { state.checkerStep = 0; state.appName=''; state.appCategory=null; state.appSensitivity=null; }
+      render(); window.scrollTo({top:0, behavior:'smooth'});
+    }, true);
+    grid.appendChild(card);
+  });
+  stageEl.appendChild(grid);
+}
+
+function renderAppNameStep(){
+  stageEl.innerHTML = '';
+  const stepLabel = document.createElement('div'); stepLabel.className='step-label mono'; stepLabel.textContent = 'Step 1 · Name the app';
+  const q = document.createElement('h2'); q.className='question'; q.textContent = 'Which app do you want to use?';
+  const hint = document.createElement('p'); hint.className='question-hint'; hint.textContent = 'Type the name as you know it — e.g. "Midjourney" or "Gamma".';
+  stageEl.appendChild(stepLabel); stageEl.appendChild(q); stageEl.appendChild(hint);
+
+  const input = document.createElement('input'); input.type='text'; input.value = state.appName; input.placeholder = 'App name';
+  input.style.cssText = 'width:100%;font:inherit;font-size:16px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink);';
+  stageEl.appendChild(input);
+
+  const nav = document.createElement('div'); nav.className='nav-row';
+  const backBtn = document.createElement('button'); backBtn.className='btn btn-ghost'; backBtn.textContent='← Back';
+  backBtn.addEventListener('click', checkerBack);
+  const nextBtn = document.createElement('button'); nextBtn.className='btn btn-primary'; nextBtn.textContent='Continue →';
+  nextBtn.disabled = !state.appName.trim();
+  nextBtn.addEventListener('click', checkerNext);
+  nav.appendChild(backBtn); nav.appendChild(nextBtn);
+  stageEl.appendChild(nav);
+
+  input.addEventListener('input', (e)=>{ state.appName = e.target.value; nextBtn.disabled = !state.appName.trim(); });
+  input.addEventListener('keydown', (e)=>{ if(e.key==='Enter' && state.appName.trim()) checkerNext(); });
+  input.focus();
+}
+
+function renderCheckerStep(){
+  const s = CHECKER_STEPS[state.checkerStep];
+  if(s==='appname'){
+    renderAppNameStep();
+  } else if(s==='category'){
+    renderQuestionStep({
+      label:'Step 2 · Category', question:'What kind of task is this app for?',
+      hint:'This helps find the closest approved alternative if it\'s not in the catalog.',
+      options: CATEGORIES.map(c=>({id:c.id, title:c.title, desc:c.desc, icon:c.icon})),
+      selectedId: state.appCategory, useIcon:true,
+      onSelect:(id)=>{ state.appCategory=id; render(); },
+      onBack: checkerBack, onNext: checkerNext, nextDisabled: !state.appCategory
+    });
+  } else if(s==='sensitivity'){
+    renderQuestionStep({
+      label:'Step 3 · Data sensitivity', question:'What kind of data will touch this app?',
+      hint:'This determines whether it needs Security approval.',
+      options: SENS_OPTIONS, selectedId: state.appSensitivity, singleCol:true,
+      onSelect:(id)=>{ state.appSensitivity=id; render(); },
+      onBack: checkerBack, onNext: checkerNext, nextDisabled: !state.appSensitivity
+    });
+  } else {
+    renderCheckerResults();
+  }
+}
+
+function findAlternatives(category, sensitivity){
+  if(!category) return [];
+  const isConfidential = sensitivity === 'confidential';
+  const neededHandling = SENS[sensitivity];
+  return TOOLS.filter(t=>t.categories.includes(category)).map(t=>{
+    const bestHandling = t.tiers.reduce((m,tier)=>Math.max(m,HANDLING[tier.handling]), 0);
+    const dataOk = isConfidential ? (t.id==='claude' && t.tiers.some(tier=>tier.budget==='enterprise')) : (bestHandling>=neededHandling);
+    return { tool:t, dataOk, isConfidential, bestHandling, accessibleTiers:t.tiers };
+  }).filter(e=>e.dataOk).sort((a,b)=> (a.tool.id==='claude'?-1:b.tool.id==='claude'?1:0) || (b.bestHandling-a.bestHandling));
+}
+
+function renderCompactList(list){
+  const wrap = document.createElement('div'); wrap.className='other-list';
+  list.forEach(e=>{
+    const row = document.createElement('div'); row.className='other-row';
+    row.innerHTML = `<div><div class="oname">${e.tool.name}</div><div class="otag">${e.tool.tagline}</div></div>`;
+    const badge = document.createElement('span'); badge.className='badge ' + handlingBadgeClass(e.bestHandling); badge.textContent = handlingLabel(e.bestHandling);
+    row.appendChild(badge);
+    wrap.appendChild(row);
+  });
+  return wrap;
+}
+
+function renderCheckerResults(){
+  stageEl.innerHTML = '';
+  const label = document.createElement('div'); label.className='step-label mono'; label.textContent = 'Results';
+  stageEl.appendChild(label);
+
+  const query = state.appName.trim().toLowerCase();
+  const matched = TOOLS.find(t=>t.name.toLowerCase()===query) ||
+    TOOLS.find(t=>{ const n=t.name.toLowerCase(); return n.includes(query) || query.includes(n); });
+
+  const catTitle = state.appCategory ? CATEGORIES.find(c=>c.id===state.appCategory).title : '';
+  const sensTitle = SENS_OPTIONS.find(o=>o.id===state.appSensitivity).title;
+  const isConfidential = state.appSensitivity === 'confidential';
+
+  if(matched){
+    const bestHandling = matched.tiers.reduce((m,t)=>Math.max(m,HANDLING[t.handling]), 0);
+    const dataOk = isConfidential
+      ? (matched.id==='claude' && matched.tiers.some(t=>t.budget==='enterprise'))
+      : (bestHandling >= SENS[state.appSensitivity]);
+    const e = { tool: matched, isConfidential, dataOk, bestHandling, accessibleTiers: matched.tiers };
+
+    const h2 = document.createElement('h2'); h2.className='question'; h2.style.fontSize='clamp(20px,3vw,26px)';
+    h2.textContent = dataOk ? `✓ Yes — ${matched.name} is approved` : `${matched.name} needs Security approval for this`;
+    stageEl.appendChild(h2);
+
+    if(dataOk){
+      stageEl.appendChild(renderToolCard(e, 1));
+    } else {
+      const note = document.createElement('p'); note.className='policy-note';
+      note.textContent = isConfidential
+        ? `Zeitview policy limits confidential/customer data to Claude Enterprise — ${matched.name} isn't cleared for that, at any tier.`
+        : `${matched.name}'s available tiers don't meet the data-handling bar for "${sensTitle}".`;
+      stageEl.appendChild(note);
+      const list = document.createElement('div'); list.className='other-list';
+      list.appendChild(renderApprovalRow(e, catTitle || matched.categories[0], sensTitle, isConfidential));
+      stageEl.appendChild(list);
+
+      const alts = state.appCategory ? findAlternatives(state.appCategory, state.appSensitivity).filter(a=>a.tool.id!==matched.id) : [];
+      if(alts.length){
+        const g = document.createElement('div'); g.className='rank-group-title'; g.textContent='Or use an already-approved alternative';
+        stageEl.appendChild(g);
+        stageEl.appendChild(renderCompactList(alts.slice(0,4)));
+      }
+    }
+  } else {
+    const h2 = document.createElement('h2'); h2.className='question'; h2.style.fontSize='clamp(20px,3vw,26px)';
+    h2.textContent = `"${state.appName}" isn't in the approved catalog`;
+    stageEl.appendChild(h2);
+
+    const alternatives = findAlternatives(state.appCategory, state.appSensitivity);
+
+    if(alternatives.length){
+      const g = document.createElement('div'); g.className='rank-group-title'; g.textContent = `Closest approved alternatives for ${catTitle}`;
+      stageEl.appendChild(g);
+      alternatives.slice(0,3).forEach((e,i)=>{ stageEl.appendChild(renderToolCard(e, i+1)); });
+    } else {
+      const empty = document.createElement('div'); empty.className='panel'; empty.style.textAlign='center'; empty.style.padding='28px 20px';
+      empty.innerHTML = `<p style="color:var(--ink-soft);font-size:14px;margin:0;">No approved tool currently covers "${catTitle}" at the "${sensTitle}" data level.</p>`;
+      stageEl.appendChild(empty);
+    }
+
+    const askBox = document.createElement('div'); askBox.className='warning-banner restricted'; askBox.style.marginTop='20px';
+    askBox.innerHTML = `<span aria-hidden="true">✉</span><span><strong>Don't see a fit?</strong> Ask IT/Security to review "${escapeHtml(state.appName)}" directly for approval.</span>`;
+    stageEl.appendChild(askBox);
+    const askLink = document.createElement('a'); askLink.className='security-link'; askLink.style.display='inline-block'; askLink.style.marginTop='4px';
+    askLink.href = appReviewHref(state.appName, catTitle, sensTitle);
+    askLink.textContent = 'Request IT review of this app →';
+    stageEl.appendChild(askLink);
+  }
+
+  const restartRow = document.createElement('div'); restartRow.className='restart-row';
+  const again = document.createElement('button'); again.className='btn btn-ghost'; again.textContent='↺ Check a different app';
+  again.addEventListener('click', checkerRestart);
+  const menuBtn = document.createElement('button'); menuBtn.className='btn btn-ghost'; menuBtn.textContent='← Back to start';
+  menuBtn.addEventListener('click', goToMenu);
+  restartRow.appendChild(again); restartRow.appendChild(menuBtn);
+  stageEl.appendChild(restartRow);
+}
+
+function render(){
+  if(state.mode === null){ consoleEl.innerHTML = ''; renderModeSelect(); return; }
+  if(state.mode === 'checker'){ renderConsole(CHECKER_STEPS, CHECKER_STEP_LABELS, state.checkerStep); renderCheckerStep(); return; }
+  renderConsole(STEPS, STEP_LABELS, state.step);
+  const s = STEPS[state.step];
+  if(s==='category'){
+    renderQuestionStep({
+      label:'Step 1 · What do you need to do?', question:'What kind of task are you trying to automate or generate?',
+      hint:'Pick the category that\'s closest to what you actually need — you can always come back.',
+      options: CATEGORIES.map(c=>({id:c.id, title:c.title, desc:c.desc, icon:c.icon})),
+      selectedId: state.category, useIcon:true,
+      onSelect:(id)=>{ state.category=id; state.subtask=null; render(); }
+    });
+  } else if(s==='subtask'){
+    const opts = SUBTASKS[state.category];
+    renderQuestionStep({
+      label:'Step 2 · Get specific', question:'Which of these is closest to your task?',
+      hint:'This narrows the list to tools that are actually good at this specific thing.',
+      options: opts, selectedId: state.subtask,
+      onSelect:(id)=>{ state.subtask=id; render(); }
+    });
+  } else if(s==='skill'){
+    renderQuestionStep({
+      label:'Step 3 · Your comfort level', question:'How technical do you want this to get?',
+      hint:'Be honest — this keeps the list from suggesting something that needs an engineer.',
+      options: SKILL_OPTIONS, selectedId: state.skill, singleCol:true,
+      onSelect:(id)=>{ state.skill=id; render(); }
+    });
+  } else if(s==='budget'){
+    renderQuestionStep({
+      label:'Step 4 · Budget & access', question:'What\'s realistic for budget or approval?',
+      hint:'This decides whether free tools are enough, or whether a paid/enterprise tier is worth pursuing.',
+      options: BUDGET_OPTIONS, selectedId: state.budget, singleCol:true,
+      onSelect:(id)=>{ state.budget=id; render(); }
+    });
+  } else if(s==='sensitivity'){
+    renderQuestionStep({
+      label:'Step 5 · Data sensitivity', question:'What kind of data or content is involved?',
+      hint:'This is the most important question for compliance — it filters out tools without adequate data protections.',
+      options: SENS_OPTIONS, selectedId: state.sensitivity, singleCol:true,
+      onSelect:(id)=>{ state.sensitivity=id; render(); }
+    });
+  } else if(s==='frequency'){
+    renderQuestionStep({
+      label:'Step 6 · How often', question:'Is this a one-time thing, or ongoing?',
+      hint:'Ongoing, repeatable tasks are often worth setting up an automation for, even if it takes longer upfront.',
+      options: FREQ_OPTIONS, selectedId: state.frequency, singleCol:true,
+      onSelect:(id)=>{ state.frequency=id; render(); }
+    });
+  } else {
+    renderResults();
+  }
+}
+
+/* ---------------------------------------------------------------------
+   SCORING ENGINE
+--------------------------------------------------------------------- */
+
+function evaluate(tool){
+  if(!tool.categories.includes(state.category)) return null;
+
+  const userSkill = SKILL[state.skill];
+  const toolSkill = SKILL[tool.skillMin];
+  if(toolSkill - userSkill >= 2) return null; // way too technical
+
+  const userBudget = BUDGET[state.budget];
+  const tMinBudget = minBudgetRank(tool.tiers);
+  if(userBudget < tMinBudget) return null; // literally can't access any tier
+
+  const accessibleTiers = tool.tiers.filter(t=>BUDGET[t.budget] <= userBudget);
+  const bestHandling = accessibleTiers.reduce((m,t)=>Math.max(m,HANDLING[t.handling]), 0);
+  const neededHandling = SENS[state.sensitivity];
+
+  // Zeitview policy: confidential/customer data is limited to Claude Enterprise
+  // specifically — not merely "some enterprise-tier tool". Every other tool,
+  // regardless of its own enterprise controls, is treated as not meeting the bar
+  // and routed to "Request Security Approval" instead of a direct recommendation.
+  const isConfidential = state.sensitivity === 'confidential';
+  const dataOk = isConfidential
+    ? (tool.id === 'claude' && accessibleTiers.some(t=>t.budget==='enterprise'))
+    : (bestHandling >= neededHandling);
+
+  let score = 0;
+
+  const subtasks = tool.subtasks[state.category] || [];
+  if(subtasks.includes(state.subtask)){ score += 3; }
+
+  if(toolSkill <= userSkill){ score += 2; }
+  else if(toolSkill - userSkill === 1){ score -= 2; }
+
+  const bestBudgetForTier = Math.min(...accessibleTiers.map(t=>BUDGET[t.budget]));
+  if(bestBudgetForTier === tMinBudget){ score += 1; }
+  score += 1; // accessible at all
+
+  if(dataOk){ score += 3; if(!isConfidential && bestHandling===neededHandling) score += 1; }
+
+  if(state.frequency==='regular'){ if(tool.ongoingFit) score += 2; if(tool.setupHeavy) score += 1; }
+  if(state.frequency==='onetime'){ if(tool.setupHeavy) score -= 2; if(!tool.ongoingFit) score += 1; }
+
+  return { tool, score, dataOk, isConfidential, bestHandling, accessibleTiers };
+}
+
+function handlingLabel(rank){
+  return rank===2 ? 'Enterprise-ready' : rank===1 ? 'Business tier' : 'Consumer only';
+}
+function handlingBadgeClass(rank){
+  return rank===2 ? 'badge-ok' : rank===1 ? 'badge-caution' : 'badge-unknown';
+}
+
+function renderResults(){
+  stageEl.innerHTML = '';
+
+  const isConfidential = state.sensitivity === 'confidential';
+  const catTitle = CATEGORIES.find(c=>c.id===state.category).title;
+  const sensTitle = SENS_OPTIONS.find(o=>o.id===state.sensitivity).title;
+
+  const evaluated = TOOLS.map(evaluate).filter(Boolean);
+  const approved = evaluated.filter(e=>e.dataOk).sort((a,b)=> b.score - a.score);
+  const needsApproval = evaluated.filter(e=>!e.dataOk).sort((a,b)=> b.score - a.score);
+
+  const top = approved.slice(0,5);
+  const restApproved = approved.slice(5,10);
+
+  const head = document.createElement('div'); head.className='results-head';
+  const label = document.createElement('div'); label.className='step-label mono'; label.textContent='Results · Your Shortlist';
+  const h2 = document.createElement('h2'); h2.className='question'; h2.style.fontSize='clamp(22px,3.4vw,30px)';
+  h2.textContent = `Best-fit tools for ${catTitle.toLowerCase()}`;
+  const meta = document.createElement('div'); meta.className='results-meta';
+  const subtaskLabel = (SUBTASKS[state.category].find(s=>s.id===state.subtask)||{}).label;
+  [subtaskLabel, SKILL_OPTIONS.find(o=>o.id===state.skill).title, BUDGET_OPTIONS.find(o=>o.id===state.budget).title, sensTitle, FREQ_OPTIONS.find(o=>o.id===state.frequency).title]
+    .filter(Boolean).forEach(t=>{ const p=document.createElement('span'); p.className='pill'; p.textContent=t; meta.appendChild(p); });
+  head.appendChild(label); head.appendChild(h2); head.appendChild(meta);
+  stageEl.appendChild(head);
+
+  if(isConfidential){
+    const policy = document.createElement('div'); policy.className='warning-banner restricted';
+    policy.innerHTML = `<span aria-hidden="true">🔒</span><span><strong>Zeitview policy:</strong> confidential or customer data may only be processed with <strong>Claude Enterprise</strong>. Every tool below that isn't Claude Enterprise needs a Security-approved exception before it touches this kind of data — use the "Request Security Approval" link on each one.</span>`;
+    stageEl.appendChild(policy);
+  }
+
+  if(top.length===0){
+    const empty = document.createElement('div'); empty.className='panel'; empty.style.textAlign='center'; empty.style.padding='36px 20px';
+    const msg = isConfidential
+      ? 'No tool clears the bar for confidential data in this category — Claude Enterprise either isn\'t reached by your stated budget, or doesn\'t cover this category. Every option is listed below under "Requires Security Approval".'
+      : 'No tool in the catalog matched every answer — try loosening the budget or skill-level answer, or see the options below that need a Security exception.';
+    empty.innerHTML = `<p style="color:var(--ink-soft);font-size:14px;margin:0;">${msg}</p>`;
+    stageEl.appendChild(empty);
+  }
+
+  top.forEach((e,i)=>{ stageEl.appendChild(renderToolCard(e, i+1)); });
+
+  if(restApproved.length){
+    const g = document.createElement('div'); g.className='rank-group-title'; g.textContent='Also worth a look';
+    stageEl.appendChild(g);
+    const list = document.createElement('div'); list.className='other-list';
+    restApproved.forEach(e=>{
+      const row = document.createElement('div'); row.className='other-row';
+      row.innerHTML = `<div><div class="oname">${e.tool.name}</div><div class="otag">${e.tool.tagline}</div></div>`;
+      const badge = document.createElement('span'); badge.className='badge ' + handlingBadgeClass(e.bestHandling); badge.textContent = handlingLabel(e.bestHandling);
+      row.appendChild(badge);
+      list.appendChild(row);
+    });
+    stageEl.appendChild(list);
+  }
+
+  if(needsApproval.length){
+    const g2 = document.createElement('div'); g2.className='rank-group-title'; g2.textContent='Requires Security Approval';
+    stageEl.appendChild(g2);
+    const note = document.createElement('p'); note.className='policy-note';
+    note.textContent = isConfidential
+      ? 'These tools don\'t meet the Claude-Enterprise-only bar for confidential or customer data. Request a Security exception before using any of them with this task.'
+      : `These tools don't meet the data-handling bar for "${sensTitle}". Request Security approval before using them with this data.`;
+    stageEl.appendChild(note);
+    const list2 = document.createElement('div'); list2.className='other-list';
+    needsApproval.slice(0,8).forEach(e=>{ list2.appendChild(renderApprovalRow(e, catTitle, sensTitle, isConfidential)); });
+    stageEl.appendChild(list2);
+  }
+
+  const restartRow = document.createElement('div'); restartRow.className='restart-row';
+  const rBtn = document.createElement('button'); rBtn.className='btn btn-ghost'; rBtn.textContent='↺ Start over with a different task';
+  rBtn.addEventListener('click', restart);
+  restartRow.appendChild(rBtn);
+  stageEl.appendChild(restartRow);
+}
+
+function renderApprovalRow(e, catTitle, sensTitle, isConfidential){
+  const tool = e.tool;
+  const row = document.createElement('div'); row.className='other-row needs-approval';
+  const info = document.createElement('div');
+  info.innerHTML = `<div class="oname">${tool.name} <span class="mono" style="font-weight:400;color:var(--ink-soft);font-size:11px;">${tool.vendor}</span></div><div class="otag">${tool.tagline}</div>`;
+  row.appendChild(info);
+
+  const side = document.createElement('div'); side.className='approval-side';
+  const badge = document.createElement('span'); badge.className='badge ' + handlingBadgeClass(e.bestHandling); badge.textContent = handlingLabel(e.bestHandling);
+  side.appendChild(badge);
+  const reasonBadge = document.createElement('span'); reasonBadge.className='badge badge-restricted';
+  reasonBadge.textContent = isConfidential ? 'Claude Enterprise required' : 'Below data bar';
+  side.appendChild(reasonBadge);
+
+  const note = isConfidential ? 'Zeitview policy currently limits this data classification to Claude Enterprise.' : null;
+  const link = document.createElement('a'); link.className='security-link';
+  link.href = securityApprovalHref(tool, catTitle, sensTitle, note);
+  link.textContent = 'Request Security Approval →';
+  side.appendChild(link);
+
+  row.appendChild(side);
+  return row;
+}
+
+function renderToolCard(e, rank){
+  const tool = e.tool;
+  const card = document.createElement('div'); card.className='tool-card';
+
+  const headRow = document.createElement('div'); headRow.className='tool-head';
+  const nameCol = document.createElement('div');
+  const nameRow = document.createElement('div'); nameRow.className='tool-name-row';
+  nameRow.innerHTML = `<span class="tool-name">${tool.name}</span><span class="tool-vendor mono">${tool.vendor}</span>`;
+  nameCol.appendChild(nameRow);
+  const tag = document.createElement('div'); tag.className='tool-tagline'; tag.textContent = tool.tagline;
+  nameCol.appendChild(tag);
+  headRow.appendChild(nameCol);
+  const rankBadge = document.createElement('span'); rankBadge.className='rank-badge mono'; rankBadge.textContent = '#' + rank + ' MATCH';
+  headRow.appendChild(rankBadge);
+  card.appendChild(headRow);
+
+  const badgeRow = document.createElement('div'); badgeRow.className='badge-row';
+  if(e.isConfidential && tool.id==='claude' && e.dataOk){
+    const policyBadge = document.createElement('span'); policyBadge.className='badge badge-ok'; policyBadge.textContent='✓ Zeitview-approved for confidential data';
+    badgeRow.appendChild(policyBadge);
+  }
+  const dataBadge = document.createElement('span'); dataBadge.className='badge ' + handlingBadgeClass(e.bestHandling); dataBadge.textContent = handlingLabel(e.bestHandling);
+  badgeRow.appendChild(dataBadge);
+  let tierLabels;
+  if(e.isConfidential && tool.id==='claude'){
+    const entTier = tool.tiers.find(t=>t.budget==='enterprise');
+    tierLabels = (entTier ? entTier.label : e.accessibleTiers.map(t=>t.label).join(' · ')) + ' — required tier for confidential data';
+  } else {
+    tierLabels = e.accessibleTiers.map(t=>t.label).join(' · ');
+  }
+  const tierBadge = document.createElement('span'); tierBadge.className='badge badge-neutral'; tierBadge.textContent = 'Within budget: ' + tierLabels;
+  badgeRow.appendChild(tierBadge);
+  card.appendChild(badgeRow);
+
+  const reasons = buildReasons(e);
+  if(reasons.length){
+    const ul = document.createElement('ul'); ul.className='why-list';
+    reasons.forEach(r=>{ const li=document.createElement('li'); li.textContent=r; ul.appendChild(li); });
+    card.appendChild(ul);
+  }
+
+  const details = document.createElement('details'); details.className='more';
+  const summary = document.createElement('summary'); summary.textContent = 'Example use case & how to get started';
+  details.appendChild(summary);
+  const grid = document.createElement('div'); grid.className='more-grid';
+
+  const exampleBlock = document.createElement('div'); exampleBlock.className='more-block';
+  const exText = (tool.example && tool.example[state.category]) || tool.tagline;
+  exampleBlock.innerHTML = `<h4>Example for your task</h4><div class="example-box">${exText}</div>`;
+  grid.appendChild(exampleBlock);
+
+  const stepsBlock = document.createElement('div'); stepsBlock.className='more-block';
+  const stepsList = document.createElement('ol'); stepsList.className='steps';
+  tool.steps.forEach(s=>{ const li=document.createElement('li'); li.textContent=s; stepsList.appendChild(li); });
+  stepsBlock.innerHTML = '<h4>Getting started</h4>';
+  stepsBlock.appendChild(stepsList);
+  grid.appendChild(stepsBlock);
+
+  details.appendChild(grid);
+  card.appendChild(details);
+
+  const footer = document.createElement('div'); footer.className='tool-footer';
+  const link = document.createElement('a'); link.className='visit-link'; link.href=tool.url; link.target='_blank'; link.rel='noopener noreferrer';
+  link.textContent = 'Visit ' + tool.name + ' →';
+  footer.appendChild(link);
+  card.appendChild(footer);
+
+  return card;
+}
+
+function buildReasons(e){
+  const tool = e.tool; const reasons = [];
+  const why = tool.why && tool.why[state.category];
+  if(why) reasons.push(why);
+  const subtasks = tool.subtasks[state.category] || [];
+  if(subtasks.includes(state.subtask)){
+    const label = (SUBTASKS[state.category].find(s=>s.id===state.subtask)||{}).label;
+    reasons.push(`Specifically good at "${(label||'').toLowerCase()}" within this category.`);
+  }
+  if(state.frequency==='regular' && tool.ongoingFit) reasons.push('Well suited to something you\'ll run repeatedly, not just once.');
+  if(state.frequency==='onetime' && !tool.setupHeavy) reasons.push('Fast to start using — no heavy setup for a one-off task.');
+  if(e.isConfidential && tool.id==='claude' && e.dataOk){
+    reasons.push('This is the Zeitview-approved path for confidential or customer data — every other tool requires a Security exception.');
+  } else if(!e.isConfidential && e.dataOk && e.bestHandling===2){
+    reasons.push('Enterprise tier available within your stated budget, with admin controls and audit logging typically on offer.');
+  }
+  return reasons;
+}
+
+/* init */
+render();
+})();
+</script>
+
+</body></html>
