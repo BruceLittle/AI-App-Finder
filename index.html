@@ -395,9 +395,7 @@ function tierMax(tiers, key, userRank, rankMap){
 function minBudgetRank(tiers){ return Math.min(...tiers.map(t=>BUDGET[t.budget])); }
 
 // Zeitview policy: confidential/customer data is limited to Claude Enterprise.
-// TODO(Bruce): point this at your real Security intake — an email alias, a ticket
-// queue address, or swap securityApprovalHref() below for a link to that system.
-const SECURITY_APPROVAL_EMAIL = 'security@zeitview.com';
+const SECURITY_APPROVAL_EMAIL = 'info-sec@zeitview.com';
 
 function securityApprovalHref(tool, categoryTitle, sensitivityTitle, note){
   const subject = `Security review request: ${tool.name} for ${categoryTitle}`;
